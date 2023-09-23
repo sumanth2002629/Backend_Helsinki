@@ -21,3 +21,9 @@ Content-Type: application/json
 
 ###
 GET https://phonebook-0uwq.onrender.com/api/persons
+
+###
+
+DELETE http://localhost:3001/api/persons/650daa6a3e423ddf9ed9658f
+###
+GET http://localhost:3001/api/persons

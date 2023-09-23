@@ -1,6 +1,11 @@
+require('dotenv').config()
+
 const express = require("express")
 const morgan = require("morgan")
 const cors = require("cors")
+
+
+const Person = require('./models/person')
 
 const app = express()
 
@@ -33,7 +38,9 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
+  Person.find({}).then(persons => {
     response.json(persons)
+  })
   })    
 
 app.get("/info", (request,response)=>{
@@ -54,11 +61,19 @@ app.get("/api/persons/:id", (req,response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response,next) => {
     const id = Number(request.params.id)
-    persons = persons.filter(note => note.id !== id)
-  
-    response.status(204).end()
+
+    Person.findByIdAndRemove(request.params.id)
+    .then((result)=>{
+        console.log(result)
+        if(result){
+        return response.status(204).end()}
+        else{
+          return response.status(404).end()
+        }
+    })
+    .catch((error => next(error)))
   })
 
 
@@ -91,16 +106,31 @@ app.delete('/api/persons/:id', (request, response) => {
       })
     }
 
-    const person = {
+    const person = new Person({
       name: body.name,
-      number: body.number,
-      id: generateId(),
-    }
+      number: body.number
+    })
+
+    person.save().then((result)=>{console.log("added")})
   
     persons = persons.concat(person)
   
     response.json(person)
   })
+
+
+  const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    } 
+  
+    next(error)
+  }
+  
+  // this has to be the last loaded middleware.
+  app.use(errorHandler)
 
 
 const PORT = process.env.PORT || 3001
