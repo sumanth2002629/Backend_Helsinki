@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
-const url = "mongodb+srv://Fullstack:Sumanth123@cluster0.p3wuumw.mongodb.net/?retryWrites=true&w=majority"
-
+const url = process.env.MONGO_URI
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
 
