@@ -40,7 +40,7 @@ let persons = [
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
-  })
+  }).catch((e)=>{response.status(404).send({error:e})})
   })    
 
 app.get("/info", (request,response)=>{
